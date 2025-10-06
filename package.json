@@ -1,0 +1,25 @@
+{
+  "name": "imagine-clone",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:frontend": "pnpm --filter @imagine/frontend dev",
+    "dev:backend": "pnpm --filter @imagine/backend dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "ui:add": "pnpm --filter @imagine/ui add-component"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
