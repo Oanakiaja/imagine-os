@@ -7,19 +7,42 @@
     "dev:frontend": "pnpm --filter @imagine/frontend dev",
     "dev:backend": "pnpm --filter @imagine/backend dev",
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
     "type-check": "turbo run type-check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "prepare": "simple-git-hooks",
     "clean": "turbo run clean && rm -rf node_modules",
     "ui:add": "pnpm --filter @imagine/ui add-component"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.7",
+    "@eslint/js": "^9.37.0",
+    "@types/eslint__js": "^9.14.0",
     "@types/node": "^20.10.0",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^9.37.0",
+    "lint-staged": "^16.2.3",
+    "prettier": "^3.6.2",
+    "simple-git-hooks": "^2.13.1",
     "turbo": "^1.11.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.15.0"
+  "packageManager": "pnpm@8.15.0",
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  }
 }

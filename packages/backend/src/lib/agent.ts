@@ -57,12 +57,15 @@ export async function* startImagineAgent(
   options: AgentOptions = {}
 ): AsyncGenerator<AgentMessage> {
   try {
-    const stream = query(userPrompt, {
-      model: options.model || 'claude-sonnet-4-20250514',
-      systemPrompt: IMAGINE_SYSTEM_PROMPT,
-      allowedTools: ['Write', 'Read', 'Edit', 'Bash'],
-      includePartialMessages: true,
-      maxThinkingTokens: options.maxTokens,
+    const stream = query({
+      prompt: userPrompt,
+      options: {
+        model: options.model || 'claude-sonnet-4-20250514',
+        systemPrompt: IMAGINE_SYSTEM_PROMPT,
+        allowedTools: ['Write', 'Read', 'Edit', 'Bash'],
+        includePartialMessages: true,
+        maxThinkingTokens: options.maxTokens,
+      },
     });
 
     for await (const message of stream) {

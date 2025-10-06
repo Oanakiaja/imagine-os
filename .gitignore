@@ -7,6 +7,7 @@ node_modules/
 coverage/
 *.lcov
 .nyc_output
+.vitest/
 
 # Build outputs
 dist/
@@ -77,3 +78,9 @@ Thumbs.db
 
 # Production
 dist-ssr/
+
+# ESLint
+.eslintcache
+
+# Rslib
+.rslib/
