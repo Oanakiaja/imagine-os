@@ -9,7 +9,9 @@ export default defineConfig({
           root: './dist',
         },
       },
-      dts: true,
+      dts: {
+        bundle: false,
+      },
     },
     {
       format: 'cjs',
