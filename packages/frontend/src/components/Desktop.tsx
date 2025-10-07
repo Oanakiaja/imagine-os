@@ -31,11 +31,11 @@ import { useDesktopAppStore } from '../store/desktopApp';
 import { ErrorRecovery } from '../store/error';
 import { streamImagine } from '../lib/api';
 import { parseAgentOutput } from '@imagine/shared';
-import type { DesktopApp } from '@imagine/shared';
+import type { AgentAction, DesktopApp } from '@imagine/shared';
 
 export function Desktop() {
   // Windows
-  const { windows, createWindow, updateWindow } = useWindowStore();
+  const { windows, createWindow, updateWindow, closeWindow } = useWindowStore();
 
   // Sticky Notes
   const { notes, createNote, updateNote, deleteNote, loadNotes } = useStickyNoteStore();
@@ -56,44 +56,54 @@ export function Desktop() {
   }, [loadNotes, initializeDefaultApps]);
 
   /**
-   * 处理命令输入
+   * 处理单个 agent action
+   * 返回是否成功处理（用于判断是否显示原始文本）
    */
+  const handleAgentAction = (action: AgentAction): boolean => {
+    if (!action) return false;
+
+    switch (action.type) {
+      case 'WINDOW_NEW':
+        createWindow(action.id, action.title, action.size);
+        return true;
+
+      case 'WINDOW_UPDATE':
+        updateWindow(action.id, action.content);
+        return true;
+
+      case 'WINDOW_CLOSE':
+        closeWindow(action.id);
+        return true;
+
+      default:
+        return false;
+    }
+  };
+
   const handleCommand = async (prompt: string) => {
     setIsGenerating(true);
-    setAgentMessages([]); // 清空之前的消息
+    setAgentMessages([]);
 
     try {
       for await (const message of streamImagine(prompt)) {
-        // 处理文本消息 - 显示到 AgentOutput
+        // 处理文本消息
         if (message.type === 'text') {
-          const text = typeof message.data === 'string' ? message.data : '';
-          if (text) {
-            setAgentMessages((prev) => [...prev, text]);
-          }
-
-          // 也尝试解析为 agent action
-          if (typeof message.data === 'object' && 'content' in message.data) {
-            const content = message.data.content;
-
-            if (Array.isArray(content)) {
-              for (const item of content) {
-                if (item.type === 'text') {
-                  const action = parseAgentOutput(item.text);
-
-                  if (action) {
-                    switch (action.type) {
-                      case 'WINDOW_NEW':
-                        createWindow(action.id, action.title, action.size);
-                        break;
-
-                      case 'WINDOW_UPDATE':
-                        updateWindow(action.id, action.content);
-                        break;
-
-                      // 未来可以添加更多 action 类型
-                    }
+          // 1. 处理字符串消息
+          if (typeof message.data === 'string') {
+            const text = message.data;
+            if (text) {
+              // 尝试解析为 action
+              const actions = parseAgentOutput(text);
+              if (actions?.length) {
+                for (const action of actions) {
+                  const handled = handleAgentAction(action);
+                  // 不能解析就显示原始文本
+                  if (!handled) {
+                    setAgentMessages((prev) => [...prev, text]);
                   }
                 }
+              } else {
+                setAgentMessages((prev) => [...prev, text]);
               }
             }
           }
@@ -108,7 +118,7 @@ export function Desktop() {
 
         // 处理完成消息
         if (message.type === 'complete') {
-          setAgentMessages((prev) => [...prev]);
+          setAgentMessages((prev) => [...prev, '✅ Generate Complete']);
         }
       }
     } catch (error) {
@@ -227,7 +237,7 @@ export function Desktop() {
         <button
           onClick={() => createNote()}
           className="group bg-white hover:bg-yellow-100 p-4 rounded-full shadow-lg hover:shadow-xl transition-all"
-          title="创建便签 (Ctrl+N)"
+          title="Create Note (Ctrl+N)"
         >
           <Plus className="h-6 w-6 text-gray-700 group-hover:text-yellow-600 transition-colors" />
         </button>

@@ -61,7 +61,7 @@ export function DesktopIcon({ app, onAction }: DesktopIconProps) {
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      title={`双击打开 ${app.name}`}
+      title={`double click to open ${app.name}`}
     >
       {/* 图标 */}
       <div

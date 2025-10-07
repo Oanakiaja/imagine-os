@@ -2,54 +2,65 @@ import type { AgentAction, WindowSize } from './types';
 
 /**
  * 解析 Agent 输出为结构化的 Action
+ *
+ * 支持的格式：
+ * - WINDOW NEW → id: xxx, title: "xxx", size: md
+ * - DOM REPLACE HTML → selector: #xxx
+ *   HTML CONTENT: <html>
+ * - WINDOW CLOSE → id: xxx
+ *
+ * 注意：selector 中的 #xxx 是 window-id，不是真的 CSS selector
  */
-export function parseAgentOutput(text: string): AgentAction | null {
+export function parseAgentOutput(text: string): AgentAction[] {
+  // 清理文本，移除多余空白
+  const cleanText = text.trim();
+  const actions: AgentAction[] = [];
   // WINDOW NEW → id: xxx, title: "xxx", size: md
-  const windowNewMatch = text.match(
-    /WINDOW NEW.*?id:\s*(\S+).*?title:\s*"([^"]+)"(?:.*?size:\s*(sm|md|lg|xl))?/
+  const windowNewMatch = cleanText.match(
+    /WINDOW NEW\s*→\s*id:\s*([a-zA-Z0-9-_]+)[\s,]*title:\s*"([^"]+)"(?:[\s,]*size:\s*(sm|md|lg|xl))?/i
   );
   if (windowNewMatch) {
-    return {
+    actions.push({
       type: 'WINDOW_NEW',
       id: windowNewMatch[1],
       title: windowNewMatch[2],
       size: (windowNewMatch[3] as WindowSize) || 'md',
-    };
+    });
   }
 
-  // DOM REPLACE HTML → selector: #xxx
-  const windowUpdateMatch = text.match(/DOM REPLACE HTML.*?selector:\s*#(\S+)/);
-  if (windowUpdateMatch) {
-    // 内容在下一行
-    const contentMatch = text.match(/HTML CONTENT:\s*([\s\S]+?)(?=\n\n|$)/);
-    if (contentMatch) {
-      return {
-        type: 'WINDOW_UPDATE',
-        id: windowUpdateMatch[1].replace(/\s+\.window-content$/, ''),
-        content: contentMatch[1].trim(),
-      };
+  // DOM REPLACE HTML + HTML CONTENT (可能在同一消息或累积的缓冲区中)
+  // 先查找 selector
+  const selectorMatch = cleanText.match(/DOM REPLACE HTML\s*→\s*selector:\s*#([a-zA-Z0-9-_]+)/i);
+  if (selectorMatch) {
+    const windowId = selectorMatch[1];
+
+    // 然后查找 HTML CONTENT
+    const htmlContentMatch = cleanText.match(/HTML CONTENT:\s*([\s\S]+?)$/);
+
+    if (htmlContentMatch) {
+      const htmlContent = htmlContentMatch[1].trim();
+
+      // 验证 HTML 至少有一些标签
+      if (htmlContent.includes('<') && htmlContent.includes('>')) {
+        actions.push({
+          type: 'WINDOW_UPDATE',
+          id: windowId,
+          content: htmlContent,
+        });
+      }
     }
   }
 
-  // INIT TOOL
-  const initToolMatch = text.match(/INIT\s+(\w+)/);
-  if (initToolMatch) {
-    return {
-      type: 'INIT_TOOL',
-      tool: initToolMatch[1],
-    };
-  }
-
-  // WINDOW CLOSE
-  const windowCloseMatch = text.match(/WINDOW CLOSE.*?id:\s*(\S+)/);
+  // WINDOW CLOSE → id: xxx
+  const windowCloseMatch = cleanText.match(/WINDOW CLOSE\s*→\s*id:\s*([a-zA-Z0-9-_]+)/i);
   if (windowCloseMatch) {
-    return {
+    actions.push({
       type: 'WINDOW_CLOSE',
       id: windowCloseMatch[1],
-    };
+    });
   }
 
-  return null;
+  return actions;
 }
 
 /**

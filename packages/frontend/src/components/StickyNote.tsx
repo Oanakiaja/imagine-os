@@ -160,7 +160,7 @@ export function StickyNote({ note, onUpdate, onDelete }: StickyNoteProps) {
             e.stopPropagation();
             onDelete(note.id);
           }}
-          title="删除便签"
+          title="delete note"
         >
           <X className="h-4 w-4 text-gray-600" />
         </button>
@@ -182,13 +182,6 @@ export function StickyNote({ note, onUpdate, onDelete }: StickyNoteProps) {
       >
         {note.content}
       </div>
-
-      {/* 编辑提示 */}
-      {!isEditing && note.content === '' && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <p className="text-gray-400 text-sm italic">点击编辑...</p>
-        </div>
-      )}
     </div>
   );
 }

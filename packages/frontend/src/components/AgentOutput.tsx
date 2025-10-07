@@ -32,7 +32,7 @@ export function AgentOutput({ messages, isGenerating }: AgentOutputProps) {
         >
           {messages.length === 0 ? (
             <div className="text-gray-500 italic flex items-center gap-2">
-              <span>hi I'am imagine os...</span>
+              <span>hi I'am imagine os....</span>
             </div>
           ) : (
             messages.map((message, index) => (

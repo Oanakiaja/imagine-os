@@ -10,7 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "sourceMap": true,
     "types": ["@types/node"],
     "baseUrl": ".",
     "paths": {

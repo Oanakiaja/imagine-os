@@ -16,7 +16,7 @@
  */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { X, Minus, Maximize2, Minimize2 } from 'lucide-react';
+import { X,  Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@imagine/ui';
 import type { ImagineWindow } from '@imagine/shared';
 import { useWindowStore } from '../store/window';
@@ -58,8 +58,7 @@ export function Window({ window }: WindowProps) {
   // 鼠标悬停状态（用于显示调整大小光标）
   const [hoverDirection, setHoverDirection] = useState<ResizeDirection>(null);
 
-  const { closeWindow, focusWindow, moveWindow, resizeWindow, toggleMinimize, toggleMaximize } =
-    useWindowStore();
+  const { closeWindow, focusWindow, moveWindow, resizeWindow, toggleMaximize } = useWindowStore();
 
   /**
    * 渲染并清理 HTML 内容
@@ -357,7 +356,7 @@ export function Window({ window }: WindowProps) {
       >
         <span className="text-white text-sm font-medium truncate">{window.title}</span>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className="h-6 w-6 text-white hover:bg-gray-700 transition-colors"
@@ -365,10 +364,10 @@ export function Window({ window }: WindowProps) {
               e.stopPropagation();
               toggleMinimize(window.id);
             }}
-            title="最小化"
+            title="Minimize"
           >
             <Minus className="h-4 w-4" />
-          </Button>
+          </Button> */}
           <Button
             variant="ghost"
             size="icon"
@@ -377,7 +376,7 @@ export function Window({ window }: WindowProps) {
               e.stopPropagation();
               toggleMaximize(window.id);
             }}
-            title={window.isMaximized ? '还原' : '最大化'}
+            title={window.isMaximized ? 'Restore' : 'Maximize'}
           >
             {window.isMaximized ? (
               <Minimize2 className="h-4 w-4" />
@@ -393,7 +392,7 @@ export function Window({ window }: WindowProps) {
               e.stopPropagation();
               closeWindow(window.id);
             }}
-            title="关闭"
+            title="Close"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -407,7 +406,7 @@ export function Window({ window }: WindowProps) {
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center gap-3">
               <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full" />
-              <p className="text-gray-500 text-sm">创建窗口中...</p>
+              <p className="text-gray-500 text-sm">Creating window...</p>
             </div>
           </div>
         )}
@@ -417,7 +416,7 @@ export function Window({ window }: WindowProps) {
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center gap-3">
               <div className="animate-pulse h-8 w-8 bg-blue-500 rounded-full" />
-              <p className="text-gray-500 text-sm">加载内容中...</p>
+              <p className="text-gray-500 text-sm">Loading content...</p>
             </div>
           </div>
         )}
@@ -427,10 +426,8 @@ export function Window({ window }: WindowProps) {
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center gap-3 p-6 bg-red-50 rounded-lg">
               <div className="text-red-500 text-4xl">⚠️</div>
-              <p className="text-red-600 font-medium">内容加载失败</p>
-              <p className="text-gray-600 text-sm text-center">
-                窗口内容无法加载，请重试或关闭窗口
-              </p>
+              <p className="text-red-600 font-medium">Error Generate</p>
+              <p className="text-gray-600 text-sm text-center">close window, and retry</p>
             </div>
           </div>
         )}

@@ -17,16 +17,11 @@ export interface ImagineWindow {
 export type AgentAction =
   | { type: 'WINDOW_NEW'; id: string; title: string; size?: WindowSize }
   | { type: 'WINDOW_UPDATE'; id: string; content: string }
-  | { type: 'WINDOW_CLOSE'; id: string }
-  | { type: 'TEXT_STREAM'; text: string }
-  | { type: 'THINKING'; text: string }
-  | { type: 'INIT_TOOL'; tool: string }
-  | { type: 'ERROR'; message: string }
-  | { type: 'COMPLETE' };
+  | { type: 'WINDOW_CLOSE'; id: string };
 
 // Agent 消息类型
 export interface AgentMessage {
-  type: 'action' | 'text' | 'error' | 'complete';
+  type: 'text' | 'error' | 'complete';
   data: AgentAction | string;
   timestamp: number;
 }

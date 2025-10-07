@@ -58,15 +58,15 @@ function ErrorToastItem({ error, onRetry, onClose }: ErrorToastItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <h4 className="text-sm font-semibold text-gray-900">
-              {error.type === 'network' && '网络错误'}
-              {error.type === 'agent' && 'Agent 错误'}
-              {error.type === 'parsing' && '解析错误'}
-              {error.type === 'unknown' && '未知错误'}
+              {error.type === 'network' && 'Network error'}
+              {error.type === 'agent' && 'Agent error'}
+              {error.type === 'parsing' && 'Action parsing error'}
+              {error.type === 'unknown' && 'Unknown error'}
             </h4>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
-              title="关闭"
+              title="Close"
             >
               <X className="h-4 w-4" />
             </button>
@@ -82,12 +82,12 @@ function ErrorToastItem({ error, onRetry, onClose }: ErrorToastItemProps) {
                 className="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors flex items-center gap-1"
               >
                 <RefreshCw className="h-3 w-3" />
-                重试 ({error.retryCount}/3)
+                Retry ({error.retryCount}/3)
               </button>
             )}
 
             {error.retryCount >= 3 && (
-              <span className="text-xs text-red-600 font-medium">重试次数已用完</span>
+              <span className="text-xs text-red-600 font-medium">Retry count used up</span>
             )}
 
             <span className="text-xs text-gray-400">
