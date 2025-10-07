@@ -16,7 +16,7 @@
  */
 
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { X,  Maximize2, Minimize2 } from 'lucide-react';
+import { X, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@imagine/ui';
 import type { ImagineWindow } from '@imagine/shared';
 import { useWindowStore } from '../store/window';
@@ -111,8 +111,6 @@ export function Window({ window }: WindowProps) {
           'class',
           'id',
           'style',
-          'data-action',
-          'data-value',
           'href',
           'target',
           'src',
@@ -136,7 +134,45 @@ export function Window({ window }: WindowProps) {
 
       contentRef.current.innerHTML = cleanHTML;
     }
-  }, [window.status, window.content]);
+  }, [window.status, window.content, window.id]);
+
+  /**
+   * 执行窗口 JavaScript（当 script 更新时）
+   */
+  useEffect(() => {
+    if (window.script && window.status === 'ready' && contentRef.current) {
+      try {
+        // 创建沙箱环境，提供常用 API
+        const sandbox = {
+          window: contentRef.current,
+          document: contentRef.current.ownerDocument,
+          console,
+          setTimeout,
+          setInterval,
+          clearTimeout,
+          clearInterval,
+          fetch,
+        };
+
+        // 使用 Function 构造器执行脚本（带沙箱）
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        const executeScript = new Function(
+          ...Object.keys(sandbox),
+          `
+          // 获取窗口根元素
+          const root = arguments[0];
+
+          // 执行用户脚本
+          ${window.script}
+        `
+        );
+
+        executeScript(contentRef.current, ...Object.values(sandbox).slice(1));
+      } catch (error) {
+        console.error('Script execution error:', error);
+      }
+    }
+  }, [window.script, window.status]);
 
   /**
    * 检测鼠标位置是否在调整大小的边缘
@@ -400,7 +436,7 @@ export function Window({ window }: WindowProps) {
       </div>
 
       {/* 窗口内容区域 */}
-      <div className="p-4 overflow-auto bg-white" style={{ height: 'calc(100% - 2.5rem)' }}>
+      <div className="overflow-auto bg-white" style={{ height: 'calc(100% - 2.5rem)' }}>
         {/* 加载状态 - 创建中 */}
         {window.status === 'creating' && (
           <div className="flex items-center justify-center h-full">

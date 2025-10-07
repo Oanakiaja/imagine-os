@@ -51,6 +51,25 @@ export function parseAgentOutput(text: string): AgentAction[] {
     }
   }
 
+  // WINDOW SCRIPT → id: xxx
+  const scriptMatch = cleanText.match(/WINDOW SCRIPT\s*→\s*id:\s*([a-zA-Z0-9-_]+)/i);
+  if (scriptMatch) {
+    const windowId = scriptMatch[1];
+
+    // 查找 SCRIPT CONTENT
+    const scriptContentMatch = cleanText.match(/SCRIPT CONTENT:\s*([\s\S]+?)$/);
+
+    if (scriptContentMatch) {
+      const scriptContent = scriptContentMatch[1].trim();
+
+      actions.push({
+        type: 'WINDOW_SCRIPT',
+        id: windowId,
+        script: scriptContent,
+      });
+    }
+  }
+
   // WINDOW CLOSE → id: xxx
   const windowCloseMatch = cleanText.match(/WINDOW CLOSE\s*→\s*id:\s*([a-zA-Z0-9-_]+)/i);
   if (windowCloseMatch) {

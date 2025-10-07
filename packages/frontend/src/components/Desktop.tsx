@@ -35,7 +35,7 @@ import type { AgentAction, DesktopApp } from '@imagine/shared';
 
 export function Desktop() {
   // Windows
-  const { windows, createWindow, updateWindow, closeWindow } = useWindowStore();
+  const { windows, createWindow, updateWindow, setWindowScript, closeWindow } = useWindowStore();
 
   // Sticky Notes
   const { notes, createNote, updateNote, deleteNote, loadNotes } = useStickyNoteStore();
@@ -71,6 +71,10 @@ export function Desktop() {
         updateWindow(action.id, action.content);
         return true;
 
+      case 'WINDOW_SCRIPT':
+        setWindowScript(action.id, action.script);
+        return true;
+
       case 'WINDOW_CLOSE':
         closeWindow(action.id);
         return true;
@@ -94,6 +98,7 @@ export function Desktop() {
             if (text) {
               // 尝试解析为 action
               const actions = parseAgentOutput(text);
+              console.log(actions);
               if (actions?.length) {
                 for (const action of actions) {
                   const handled = handleAgentAction(action);

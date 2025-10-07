@@ -9,6 +9,7 @@ interface WindowStore {
   // Actions
   createWindow: (id: string, title: string, size?: WindowSize) => void;
   updateWindow: (id: string, content: string) => void;
+  setWindowScript: (id: string, script: string) => void;
   closeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
   moveWindow: (id: string, x: number, y: number) => void;
@@ -53,6 +54,17 @@ export const useWindowStore = create<WindowStore>((set) => ({
       if (window) {
         window.status = 'ready';
         window.content = content;
+      }
+      return { windows: newWindows };
+    });
+  },
+
+  setWindowScript: (id, script) => {
+    set((state) => {
+      const newWindows = new Map(state.windows);
+      const window = newWindows.get(id);
+      if (window) {
+        window.script = script;
       }
       return { windows: newWindows };
     });

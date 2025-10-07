@@ -6,6 +6,7 @@ export interface ImagineWindow {
   title: string;
   status: WindowStatus;
   content: string | null;
+  script?: string | null; // JavaScript to execute after content loads
   position: { x: number; y: number };
   size: { width: number; height: number };
   zIndex: number;
@@ -17,6 +18,7 @@ export interface ImagineWindow {
 export type AgentAction =
   | { type: 'WINDOW_NEW'; id: string; title: string; size?: WindowSize }
   | { type: 'WINDOW_UPDATE'; id: string; content: string }
+  | { type: 'WINDOW_SCRIPT'; id: string; script: string }
   | { type: 'WINDOW_CLOSE'; id: string };
 
 // Agent 消息类型
