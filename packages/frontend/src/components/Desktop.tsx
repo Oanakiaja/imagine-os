@@ -24,6 +24,7 @@ import { StickyNote } from './StickyNote';
 import { DesktopIcon } from './DesktopIcon';
 import { CommandInput } from './CommandInput';
 import { ErrorToast } from './ErrorToast';
+import { AgentOutput } from './AgentOutput';
 import { useWindowStore } from '../store/window';
 import { useStickyNoteStore } from '../store/stickyNote';
 import { useDesktopAppStore } from '../store/desktopApp';
@@ -44,6 +45,7 @@ export function Desktop() {
 
   // Generation state
   const [isGenerating, setIsGenerating] = useState(false);
+  const [agentMessages, setAgentMessages] = useState<string[]>([]);
 
   /**
    * 初始化：加载便签和桌面应用
@@ -58,33 +60,38 @@ export function Desktop() {
    */
   const handleCommand = async (prompt: string) => {
     setIsGenerating(true);
+    setAgentMessages([]); // 清空之前的消息
 
     try {
       for await (const message of streamImagine(prompt)) {
-        // 处理文本消息
-        if (
-          message.type === 'text' &&
-          typeof message.data === 'object' &&
-          'content' in message.data
-        ) {
-          const content = message.data.content;
+        // 处理文本消息 - 显示到 AgentOutput
+        if (message.type === 'text') {
+          const text = typeof message.data === 'string' ? message.data : '';
+          if (text) {
+            setAgentMessages((prev) => [...prev, text]);
+          }
 
-          if (Array.isArray(content)) {
-            for (const item of content) {
-              if (item.type === 'text') {
-                const action = parseAgentOutput(item.text);
+          // 也尝试解析为 agent action
+          if (typeof message.data === 'object' && 'content' in message.data) {
+            const content = message.data.content;
 
-                if (action) {
-                  switch (action.type) {
-                    case 'WINDOW_NEW':
-                      createWindow(action.id, action.title, action.size);
-                      break;
+            if (Array.isArray(content)) {
+              for (const item of content) {
+                if (item.type === 'text') {
+                  const action = parseAgentOutput(item.text);
 
-                    case 'WINDOW_UPDATE':
-                      updateWindow(action.id, action.content);
-                      break;
+                  if (action) {
+                    switch (action.type) {
+                      case 'WINDOW_NEW':
+                        createWindow(action.id, action.title, action.size);
+                        break;
 
-                    // 未来可以添加更多 action 类型
+                      case 'WINDOW_UPDATE':
+                        updateWindow(action.id, action.content);
+                        break;
+
+                      // 未来可以添加更多 action 类型
+                    }
                   }
                 }
               }
@@ -94,14 +101,20 @@ export function Desktop() {
 
         // 处理错误消息
         if (message.type === 'error') {
-          await ErrorRecovery.handleAgentError(
-            new Error(typeof message.data === 'string' ? message.data : 'Unknown error')
-          );
+          const errorText = typeof message.data === 'string' ? message.data : 'Unknown error';
+          setAgentMessages((prev) => [...prev, `❌ 错误: ${errorText}`]);
+          await ErrorRecovery.handleAgentError(new Error(errorText));
+        }
+
+        // 处理完成消息
+        if (message.type === 'complete') {
+          setAgentMessages((prev) => [...prev, '✅ 完成']);
         }
       }
     } catch (error) {
       // 网络错误恢复
       if (error instanceof Error) {
+        setAgentMessages((prev) => [...prev, `❌ 异常: ${error.message}`]);
         if (error.message.includes('fetch') || error.message.includes('network')) {
           await ErrorRecovery.handleNetworkError(error, () => handleCommand(prompt));
         } else {
@@ -199,16 +212,11 @@ export function Desktop() {
         <Window key={window.id} window={window} />
       ))}
 
+      {/* Agent 输出显示 */}
+      <AgentOutput messages={agentMessages} isGenerating={isGenerating} />
+
       {/* 命令输入 */}
       <CommandInput onSubmit={(prompt) => void handleCommand(prompt)} disabled={isGenerating} />
-
-      {/* 加载指示器 */}
-      {isGenerating && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 z-50">
-          <div className="animate-spin h-5 w-5 border-3 border-blue-500 border-t-transparent rounded-full" />
-          <span className="text-sm font-medium text-gray-700">Agent 正在生成...</span>
-        </div>
-      )}
 
       {/* 错误提示 */}
       <ErrorToast />

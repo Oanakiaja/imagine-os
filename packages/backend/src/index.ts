@@ -2,6 +2,19 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { imagineRouter } from './routes/imagine';
+import { serve } from '@hono/node-server';
+import { config } from 'dotenv';
+
+// Load environment variables with explicit path
+config();
+
+// Validate required environment variables
+if (!process.env.CLAUDE_CLI_BIN) {
+  console.error('❌ Error: CLAUDE_CLI_BIN is required in .env file');
+  process.exit(1);
+} else {
+  console.log('[using which claude]', process.env.CLAUDE_CLI_BIN);
+}
 
 const app = new Hono();
 
@@ -23,11 +36,26 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', timestamp: Date.now() });
 });
 
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT || 3001);
+
+const server = serve({
+  port: port,
+  fetch: app.fetch,
+});
 
 console.log(`🚀 Server running on http://localhost:${port}`);
 
-export default {
-  port,
-  fetch: app.fetch,
-};
+// graceful shutdown
+process.on('SIGINT', () => {
+  server.close();
+  process.exit(0);
+});
+process.on('SIGTERM', () => {
+  server.close((err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    process.exit(0);
+  });
+});

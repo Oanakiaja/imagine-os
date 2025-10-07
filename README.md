@@ -2,12 +2,14 @@
 
 Imagine with Claude's Open Source Clone.
 
+![Image](./assets/image.png)
+
 ## Tech Stack
 
 - **Monorepo**: pnpm workspace + Turborepo
 - **Frontend**: Vite + React + Tailwind CSS
-- **Backend**: Hono.js + Bun
-- **AI**: Claude Agent SDK
+- **Backend**: Hono.js
+- **AI**: Claude Code CLI
 - **UI Components**: shadcn/ui (@imagine/ui)
 - **Build Tool**: rslib (for shared packages)
 - **Testing**: Vitest
@@ -16,12 +18,12 @@ Imagine with Claude's Open Source Clone.
 ## Project Structure
 
 ```
-imagine-clone/
+imagine-os/
 ├── packages/
 │   ├── shared/           # Shared types and utilities (rslib)
 │   ├── ui/               # UI component library (rslib + shadcn/ui)
 │   ├── frontend/         # React frontend (Vite)
-│   └── backend/          # API server (Hono.js + Bun)
+│   └── backend/          # API server (Hono.js)
 ├── pnpm-workspace.yaml
 ├── turbo.json
 └── package.json
@@ -31,9 +33,8 @@ imagine-clone/
 
 ### Prerequisites
 
-- Node.js >= 20
-- pnpm >= 8
-- Bun >= 1.0
+- Node.js >= 22
+- pnpm >= 9
 
 ### Installation
 
@@ -49,12 +50,14 @@ pnpm --filter @imagine/ui build
 ### Configuration
 
 1. Copy backend environment file:
+
 ```bash
 cd packages/backend
 cp .env.example .env
 ```
 
 2. Add your Anthropic API key to `packages/backend/.env`:
+
 ```
 ANTHROPIC_API_KEY=your-api-key-here
 ```
@@ -100,32 +103,35 @@ pnpm ui:add
 ## Package Details
 
 ### @imagine/shared
+
 - Shared TypeScript types
 - Utility functions
 - Agent action parsers
 - Built with rslib
 
 ### @imagine/ui
+
 - Reusable React components
 - Based on shadcn/ui
 - Tailwind CSS styling
 - Built with rslib
 
 ### @imagine/frontend
+
 - Main React application
 - Vite for fast development
 - Zustand for state management
-- SSE client for Agent streaming
+- SSE client for streaming responses
 
 ### @imagine/backend
+
 - Hono.js REST API
-- Claude Agent SDK integration
+- Claude Code CLI integration
 - Server-Sent Events (SSE) support
-- Running on Bun
 
 ## Features
 
-- Real-time UI generation via Agent SDK
+- Real-time UI generation via Claude Code CLI
 - Drag-and-drop window management
 - Minimize/maximize/close windows
 - Beautiful gradient desktop background
@@ -139,7 +145,7 @@ User Input → Frontend (React)
     ↓
 API Call (SSE) → Backend (Hono.js)
     ↓
-Agent SDK → Claude Sonnet 4.5
+Claude Code CLI → Claude Sonnet 4.5
     ↓
 Streaming Response ← Backend
     ↓

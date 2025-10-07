@@ -1,4 +1,4 @@
-import { query } from '@anthropic-ai/claude-agent-sdk';
+import { invokeClaudeCode } from './claude-code-agent';
 import type { AgentMessage } from '@imagine/shared';
 
 const IMAGINE_SYSTEM_PROMPT = `You are a UI generation agent (codename: Heli).
@@ -48,7 +48,6 @@ HTML CONTENT:
 Remember: User experience is paramount. Create beautiful, functional UIs.`;
 
 export interface AgentOptions {
-  model?: string;
   maxTokens?: number;
 }
 
@@ -57,31 +56,12 @@ export async function* startImagineAgent(
   options: AgentOptions = {}
 ): AsyncGenerator<AgentMessage> {
   try {
-    const stream = query({
-      prompt: userPrompt,
-      options: {
-        model: options.model || 'claude-sonnet-4-20250514',
-        systemPrompt: IMAGINE_SYSTEM_PROMPT,
-        allowedTools: ['Write', 'Read', 'Edit', 'Bash'],
-        includePartialMessages: true,
-        maxThinkingTokens: options.maxTokens,
-      },
+    const stream = invokeClaudeCode(userPrompt, IMAGINE_SYSTEM_PROMPT, {
+      timeout: options.maxTokens ? options.maxTokens * 100 : 60000, // 根据 token 数估算超时
     });
 
     for await (const message of stream) {
-      // 转换 Agent SDK 消息为我们的格式
-      const agentMessage: AgentMessage = {
-        type: mapMessageType(message.type),
-        data: message,
-        timestamp: Date.now(),
-      };
-
-      yield agentMessage;
-
-      // 如果是结果消息，结束流
-      if (message.type === 'result') {
-        break;
-      }
+      yield message;
     }
   } catch (error) {
     yield {
@@ -89,18 +69,5 @@ export async function* startImagineAgent(
       data: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now(),
     };
-  }
-}
-
-function mapMessageType(sdkType: string): AgentMessage['type'] {
-  switch (sdkType) {
-    case 'assistant':
-      return 'text';
-    case 'result':
-      return 'complete';
-    case 'error':
-      return 'error';
-    default:
-      return 'text';
   }
 }

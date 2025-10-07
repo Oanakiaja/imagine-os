@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Setting up Imagine Clone..."
+echo "🚀 Setting up Imagine OS..."
 
 # Check if pnpm is installed
 if ! command -v pnpm &> /dev/null; then
@@ -22,15 +22,6 @@ echo "🔨 Building shared packages..."
 pnpm --filter @imagine/shared build
 pnpm --filter @imagine/ui build
 
-echo "⚙️  Setting up backend environment..."
-if [ ! -f packages/backend/.env ]; then
-    cp packages/backend/.env.example packages/backend/.env
-    echo "✅ Created packages/backend/.env"
-    echo "⚠️  Please add your ANTHROPIC_API_KEY to packages/backend/.env"
-else
-    echo "✅ packages/backend/.env already exists"
-fi
-
 echo ""
 echo "✨ Setup complete!"
 echo ""
@@ -39,4 +30,3 @@ echo "  pnpm dev              # Start all services"
 echo "  pnpm dev:frontend     # Frontend only (http://localhost:5173)"
 echo "  pnpm dev:backend      # Backend only (http://localhost:3001)"
 echo ""
-echo "Don't forget to add your ANTHROPIC_API_KEY to packages/backend/.env!"

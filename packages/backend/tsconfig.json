@@ -10,7 +10,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["@types/bun"],
+    "sourceMap": true,
+    "types": ["@types/node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

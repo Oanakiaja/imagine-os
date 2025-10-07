@@ -44,21 +44,10 @@ if [ ! -f "packages/backend/.env" ]; then
     echo "⚠️  No .env file found"
     echo "📝 Creating .env from example..."
     cp packages/backend/.env.example packages/backend/.env
-    echo ""
-    echo "⚠️  IMPORTANT: Edit packages/backend/.env and add your ANTHROPIC_API_KEY"
-    echo "   Get your key from: https://console.anthropic.com"
-    echo ""
     read -p "Press Enter to continue after adding your API key..."
 fi
 
-# Check if API key is set
-if grep -q "your-api-key-here" packages/backend/.env; then
-    echo ""
-    echo "⚠️  WARNING: ANTHROPIC_API_KEY is not configured!"
-    echo "   Edit packages/backend/.env and replace 'your-api-key-here' with your actual API key"
-    echo ""
-    read -p "Press Enter to continue anyway (backend will fail without valid key)..."
-fi
+
 
 echo ""
 echo "✅ All checks passed!"
