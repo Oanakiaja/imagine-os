@@ -63,10 +63,11 @@ export function Window({ window }: WindowProps) {
   /**
    * 渲染并清理 HTML 内容
    * 使用 DOMPurify 防止 XSS 攻击
+   * 处理内联 <style> 标签，将其提取到 document head
    */
   useEffect(() => {
     if (window.status === 'ready' && window.content && contentRef.current) {
-      // 清理 HTML，移除潜在的恶意脚本
+      // 清理 HTML，移除潜在的恶意脚本，但保留 style 标签
       const cleanHTML = DOMPurify.sanitize(window.content, {
         ALLOWED_TAGS: [
           'div',
@@ -106,6 +107,7 @@ export function Window({ window }: WindowProps) {
           'circle',
           'rect',
           'line',
+          'style', // 允许 style 标签
         ],
         ALLOWED_ATTR: [
           'class',
@@ -133,7 +135,26 @@ export function Window({ window }: WindowProps) {
       });
 
       contentRef.current.innerHTML = cleanHTML;
+
+      // 提取并处理所有 <style> 标签
+      const styleTags = contentRef.current.querySelectorAll('style');
+      styleTags.forEach((styleTag) => {
+        // 创建新的 style 元素添加到 head
+        const newStyle = document.createElement('style');
+        newStyle.textContent = styleTag.textContent;
+        newStyle.setAttribute('data-window-id', window.id); // 标记所属窗口
+        document.head.appendChild(newStyle);
+
+        // 从内容中移除原 style 标签
+        styleTag.remove();
+      });
     }
+
+    // 清理：当窗口卸载时移除添加的 style 标签
+    return () => {
+      const windowStyles = document.head.querySelectorAll(`style[data-window-id="${window.id}"]`);
+      windowStyles.forEach((style) => style.remove());
+    };
   }, [window.status, window.content, window.id]);
 
   /**
@@ -370,7 +391,7 @@ export function Window({ window }: WindowProps) {
   return (
     <div
       ref={windowRef}
-      className="bg-white rounded-lg shadow-2xl overflow-hidden"
+      className="rounded-lg shadow-2xl overflow-hidden"
       style={windowStyle}
       onMouseDown={(e) => {
         focusWindow(window.id);
@@ -436,7 +457,13 @@ export function Window({ window }: WindowProps) {
       </div>
 
       {/* 窗口内容区域 */}
-      <div className="overflow-auto bg-white" style={{ height: 'calc(100% - 2.5rem)' }}>
+      <div
+        className="overflow-auto"
+        style={{
+          height: 'calc(100% - 2.5rem)',
+          backgroundColor: window.status === 'ready' ? 'transparent' : 'white',
+        }}
+      >
         {/* 加载状态 - 创建中 */}
         {window.status === 'creating' && (
           <div className="flex items-center justify-center h-full">

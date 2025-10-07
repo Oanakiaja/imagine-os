@@ -42,17 +42,15 @@ export async function* invokeClaudeCode(
   let isTimedOut = false;
 
   try {
-    // 生成消息: 开始处理
     yield {
       type: 'text',
-      data: 'Starting Claude Code agent...',
+      data: prompt,
       timestamp: Date.now(),
     };
 
     // 构建 Claude CLI 参数
     const args = [
       '-p',
-      '--continue',
       '--dangerously-skip-permissions',
       '--append-system-prompt',
       systemPrompt,

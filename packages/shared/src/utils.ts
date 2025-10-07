@@ -34,11 +34,17 @@ export function parseAgentOutput(text: string): AgentAction[] {
   if (selectorMatch) {
     const windowId = selectorMatch[1];
 
-    // 然后查找 HTML CONTENT
-    const htmlContentMatch = cleanText.match(/HTML CONTENT:\s*([\s\S]+?)$/);
+    // 然后查找 HTML CONTENT，但要在遇到 WINDOW SCRIPT 之前停止
+    // 使用非贪婪匹配，并且在遇到 WINDOW 关键字时停止
+    const htmlContentMatch = cleanText.match(
+      /HTML CONTENT:\s*([\s\S]+?)(?=\n\s*WINDOW\s+(?:SCRIPT|CLOSE|NEW)|$)/i
+    );
 
     if (htmlContentMatch) {
-      const htmlContent = htmlContentMatch[1].trim();
+      let htmlContent = htmlContentMatch[1].trim();
+
+      // 移除可能包含的 <style> 标签后的内容（如果紧跟着 WINDOW 命令）
+      htmlContent = htmlContent.replace(/\n\s*WINDOW\s+(?:SCRIPT|CLOSE|NEW)[\s\S]*$/i, '').trim();
 
       // 验证 HTML 至少有一些标签
       if (htmlContent.includes('<') && htmlContent.includes('>')) {
@@ -56,8 +62,10 @@ export function parseAgentOutput(text: string): AgentAction[] {
   if (scriptMatch) {
     const windowId = scriptMatch[1];
 
-    // 查找 SCRIPT CONTENT
-    const scriptContentMatch = cleanText.match(/SCRIPT CONTENT:\s*([\s\S]+?)$/);
+    // 查找 SCRIPT CONTENT，到文件结尾或下一个 WINDOW 命令
+    const scriptContentMatch = cleanText.match(
+      /SCRIPT CONTENT:\s*([\s\S]+?)(?=\n\s*WINDOW\s+(?:NEW|CLOSE|SCRIPT)|$)/i
+    );
 
     if (scriptContentMatch) {
       const scriptContent = scriptContentMatch[1].trim();
