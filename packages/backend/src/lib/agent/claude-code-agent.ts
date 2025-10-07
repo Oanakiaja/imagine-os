@@ -2,7 +2,7 @@ import { spawn, type ChildProcess, execSync } from 'node:child_process';
 import type { AgentMessage } from '@imagine/shared';
 
 export interface ClaudeCodeOptions {
-  timeout?: number; // 默认 60 秒
+  timeout?: number; // 默认 120 秒
   workingDir?: string;
 }
 
@@ -35,7 +35,7 @@ export async function* invokeClaudeCode(
   systemPrompt: string,
   options: ClaudeCodeOptions = {}
 ): AsyncGenerator<AgentMessage> {
-  const { timeout = 60000, workingDir = process.cwd() } = options;
+  const { timeout = 120000, workingDir = process.cwd() } = options;
 
   let claudeProcess: ChildProcess | null = null;
   let timeoutId: NodeJS.Timeout | null = null;

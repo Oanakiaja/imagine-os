@@ -12,7 +12,7 @@ export async function* startImagineAgent(
 ): AsyncGenerator<AgentMessage> {
   try {
     const stream = invokeClaudeCode(userPrompt, IMAGINE_SYSTEM_PROMPT, {
-      timeout: options.maxTokens ? options.maxTokens * 100 : 60000, // 根据 token 数估算超时
+      timeout: options.maxTokens ? options.maxTokens * 100 : undefined,
     });
 
     for await (const message of stream) {
