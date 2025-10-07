@@ -52,3 +52,34 @@ export interface ImagineResponse {
   message?: string;
   error?: string;
 }
+
+// Sticky Note 类型
+export interface StickyNote {
+  id: string;
+  content: string;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  color: 'yellow' | 'pink' | 'blue' | 'green';
+  createdAt: number;
+  updatedAt: number;
+}
+
+// Desktop App 类型
+export interface DesktopApp {
+  id: string;
+  name: string;
+  icon: string; // URL or emoji
+  action: 'window' | 'external' | 'system';
+  actionData?: any; // Window ID, URL, etc.
+  position: { x: number; y: number };
+}
+
+// Error Recovery 类型
+export interface ErrorState {
+  id: string;
+  type: 'network' | 'agent' | 'parsing' | 'unknown';
+  message: string;
+  timestamp: number;
+  recoverable: boolean;
+  retryCount: number;
+}

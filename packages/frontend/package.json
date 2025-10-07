@@ -14,12 +14,14 @@
   "dependencies": {
     "@imagine/shared": "workspace:*",
     "@imagine/ui": "workspace:*",
+    "dompurify": "^3.2.7",
     "lucide-react": "^0.460.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.2.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
