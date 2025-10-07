@@ -67,7 +67,7 @@ export interface DesktopApp {
   name: string;
   icon: string; // URL or emoji
   action: 'window' | 'external' | 'system';
-  actionData?: any; // Window ID, URL, etc.
+  actionData?: string | { prompt?: string }; // Window prompt, URL, or system action
   position: { x: number; y: number };
 }
 

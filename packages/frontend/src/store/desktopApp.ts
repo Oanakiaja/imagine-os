@@ -54,7 +54,7 @@ const DEFAULT_APPS: DesktopApp[] = [
     name: 'Code',
     icon: '🤖',
     action: 'external',
-    actionData: 'https://claude.ai/code',
+    // actionData: 'https://claude.ai/code',
     position: { x: 20, y: 120 },
   },
   {
@@ -62,10 +62,10 @@ const DEFAULT_APPS: DesktopApp[] = [
     name: "Claw'd",
     icon: '🦀',
     action: 'window',
-    actionData: {
-      title: "Claw'd Game",
-      prompt: 'Create an interactive crab game with pixel art character that can move around',
-    },
+    // actionData: {
+    //   title: "Claw'd Game",
+    //   prompt: 'Create an interactive crab game with pixel art character that can move around',
+    // },
     position: { x: 20, y: 220 },
   },
 ];
