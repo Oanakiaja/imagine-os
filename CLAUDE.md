@@ -27,7 +27,15 @@ pnpm dev:backend   # Backend at http://localhost:3001
 pnpm build
 
 # Run tests
-pnpm test
+pnpm test           # Run all tests
+pnpm test:ui        # Run tests with UI
+pnpm test:run       # Run tests once (CI mode)
+
+# Linting and formatting
+pnpm lint           # Check for lint errors
+pnpm lint:fix       # Auto-fix lint errors
+pnpm format         # Format all files
+pnpm format:check   # Check formatting
 
 # Type checking
 pnpm type-check
@@ -58,29 +66,36 @@ pnpm --filter @imagine/<package-name> test
 
 1. User enters prompt in CommandInput
 2. Frontend sends SSE request to `/api/imagine`
-3. Backend streams Agent SDK responses
+3. Backend streams Claude Code CLI responses
 4. Frontend parses agent actions and manipulates window state
 5. Windows render with draggable/resizable functionality
 
-### Agent Action Protocol (packages/backend/src/lib/agent.ts:4-48)
+### Agent Action Protocol
 
-The agent follows a specific sequence defined in IMAGINE_SYSTEM_PROMPT:
+The agent (packages/backend/src/lib/agent/prompt.ts) follows a specific sequence defined in IMAGINE_SYSTEM_PROMPT:
 
 ```
 1. WINDOW NEW → id: <unique-id>, title: "<title>", size: <sm|md|lg|xl>
-2. INIT <TOOL_NAME> (optional for tools like STORAGE)
-3. Prepare data silently
-4. DOM REPLACE HTML → selector: #<window-id> .window-content
-5. HTML CONTENT: <complete HTML>
+2. DOM REPLACE HTML → selector: #<window-id>
+   HTML CONTENT: <complete HTML>
+3. WINDOW SCRIPT → id: <window-id> (optional)
+   SCRIPT CONTENT: <JavaScript code>
 ```
+
+**Action parsing** (packages/shared/src/utils.ts:parseAgentOutput):
+
+- Text output from agent is parsed into structured AgentAction objects
+- Supports WINDOW_NEW, WINDOW_UPDATE, WINDOW_SCRIPT, WINDOW_CLOSE actions
+- Uses regex patterns to extract window IDs, titles, sizes, HTML content, and scripts
 
 Critical rules:
 
 - Windows are created immediately empty (status: 'creating')
 - Content updates only happen with complete HTML
 - No streaming partial HTML
-- All interactive elements use `data-action` attributes
 - Tailwind CSS for styling
+- JavaScript executes in a sandboxed environment with access to `root` element
+- Window content container has `w-full h-full` classes - agent-generated HTML should set its own layout (flex/grid)
 
 ### State Management (packages/frontend/src/store/window.ts)
 
@@ -126,9 +141,18 @@ cp .env.example .env
 The backend runs on Bun and uses:
 
 - Hono.js for routing
-- Claude Agent SDK with model `claude-sonnet-4-20250514`
+- Claude Claude Code CLI (packages/backend/src/lib/agent/claude-code-agent.ts)
+- Model: `claude-sonnet-4-20250514`
 - Server-Sent Events (SSE) for streaming
 - Allowed tools: Write, Read, Edit, Bash
+
+**SSE Message Flow:**
+
+1. Frontend calls `/api/imagine` with POST request containing prompt
+2. Backend invokes Claude Claude Code CLI with system prompt
+3. Agent responses are streamed as SSE messages (type: text, complete, error)
+4. Frontend (packages/frontend/src/lib/api.ts) parses SSE and yields AgentMessage objects
+5. Messages are parsed for agent actions and window state is updated
 
 ## Frontend Details
 
@@ -137,15 +161,49 @@ The backend runs on Bun and uses:
 - Tailwind CSS for styling
 - Zustand for state management
 - SSE client in `packages/frontend/src/lib/api.ts`
-- Window components support drag/drop, minimize/maximize/close
+- Window components (packages/frontend/src/components/Window.tsx) support:
+  - Drag from title bar
+  - Resize from edges and corners (8px detection zone)
+  - Double-click title bar to maximize/restore
+  - Minimize/maximize/close buttons
+  - DOMPurify for HTML sanitization
+  - Script execution in sandboxed environment
 - Desktop has gradient background
+- Window content container is `w-full h-full` by default - agent HTML should define its own layout
 
 ## Adding New Features
 
-1. **New Agent Actions**: Update `AgentAction` type in `packages/shared/src/types.ts`
-2. **Window Behavior**: Modify Zustand store in `packages/frontend/src/store/window.ts`
-3. **Agent System Prompt**: Edit `IMAGINE_SYSTEM_PROMPT` in `packages/backend/src/lib/agent.ts`
-4. **UI Components**: Add to `packages/ui/src/components/` and export from `index.ts`
+1. **New Agent Actions**:
+   - Update `AgentAction` type in `packages/shared/src/types.ts`
+   - Update `parseAgentOutput` regex patterns in `packages/shared/src/utils.ts`
+   - Update agent prompt examples in `packages/backend/src/lib/agent/prompt.ts`
+
+2. **Window Behavior**:
+   - Modify Zustand store in `packages/frontend/src/store/window.ts`
+   - Update window component in `packages/frontend/src/components/Window.tsx`
+
+3. **Agent System Prompt**:
+   - Edit `IMAGINE_SYSTEM_PROMPT` in `packages/backend/src/lib/agent/prompt.ts`
+   - Update examples to demonstrate correct usage patterns
+
+4. **UI Components**:
+   - Add to `packages/ui/src/components/` and export from `index.ts`
+   - Run `pnpm ui:add` to add new shadcn/ui components
+
+## Common Patterns
+
+### Agent HTML Generation
+
+- Always wrap content in a root div with layout classes (`flex flex-col h-full`, `grid`, etc.)
+- Use Tailwind utilities directly on elements
+- For grid layouts with gap, ensure parent has `display: grid` or `display: flex`
+- Example: `<div class="flex flex-col h-full gap-4 p-4">...</div>`
+
+### Window Content Layout
+
+- Container is `w-full h-full` by default (block display)
+- Agent should define its own layout at the root level
+- Common patterns: `flex flex-col h-full`, `grid grid-cols-4 gap-2`, etc.
 
 ## Monorepo Structure
 
@@ -153,3 +211,4 @@ The backend runs on Bun and uses:
 - Pipeline in `turbo.json` handles build dependencies
 - Shared packages built with rslib
 - Use `workspace:*` for internal package dependencies
+- Pre-commit hooks run lint-staged for code quality

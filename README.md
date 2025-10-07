@@ -2,7 +2,7 @@
 
 Imagine with Claude's Open Source Clone.
 
-![Image](./assets/image.png)
+![Image](./assets/gif.gif)
 
 ## Tech Stack
 
@@ -35,6 +35,7 @@ imagine-os/
 
 - Node.js >= 22
 - pnpm >= 9
+- Bun >= 1.0 (for backend runtime)
 
 ### Installation
 
