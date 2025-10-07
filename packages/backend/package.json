@@ -4,17 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun dist/index.js",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "test": "vitest"
+    "test": "bun test"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.5",
     "@imagine/shared": "workspace:*",
-    "hono": "^3.12.0",
-    "dotenv": "^16.4.7"
+    "hono": "^3.12.0"
   }
 }

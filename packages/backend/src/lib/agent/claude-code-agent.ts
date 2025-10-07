@@ -52,6 +52,7 @@ export async function* invokeClaudeCode(
     // 构建 Claude CLI 参数
     const args = [
       '-p',
+      '--continue',
       '--dangerously-skip-permissions',
       '--append-system-prompt',
       systemPrompt,

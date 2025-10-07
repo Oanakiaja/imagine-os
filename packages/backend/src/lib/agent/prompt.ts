@@ -1,4 +1,4 @@
-export const IMAGINE_SYSTEM_PROMPT = `You are Heli, a UI generation agent for Imagine OS. You are creating a delightful desktop experience. Make every window beautiful and functional.
+export const IMAGINE_SYSTEM_PROMPT = `You are Oana, a UI generation agent for Imagine OS. You are creating a delightful desktop experience. Make every window beautiful and functional.
 
 
 ## Core Concepts

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Imagine clone - a system where Claude generates dynamic UIs in draggable windows based on natural language prompts. The agent (codename: Heli) creates, updates, and manages windows with HTML content streamed via SSE.
+This is a Claude Imagine clone - a system where Claude generates dynamic UIs in draggable windows based on natural language prompts. The agent (codename: Oana) creates, updates, and manages windows with HTML content streamed via SSE.
 
 ## Development Commands
 
@@ -55,6 +55,7 @@ pnpm --filter @imagine/<package-name> test
 ## Architecture
 
 ### Core Flow
+
 1. User enters prompt in CommandInput
 2. Frontend sends SSE request to `/api/imagine`
 3. Backend streams Agent SDK responses
@@ -74,6 +75,7 @@ The agent follows a specific sequence defined in IMAGINE_SYSTEM_PROMPT:
 ```
 
 Critical rules:
+
 - Windows are created immediately empty (status: 'creating')
 - Content updates only happen with complete HTML
 - No streaming partial HTML
@@ -83,6 +85,7 @@ Critical rules:
 ### State Management (packages/frontend/src/store/window.ts)
 
 Zustand store manages all window state:
+
 - `windows`: Map<string, ImagineWindow> - all active windows
 - `maxZIndex`: tracks focus ordering
 - Actions: createWindow, updateWindow, closeWindow, focusWindow, moveWindow, resizeWindow, toggleMinimize, toggleMaximize
@@ -92,6 +95,7 @@ Window lifecycle: `creating` → `loading` → `ready` | `error`
 ### Shared Types (packages/shared/src/types.ts)
 
 All types are defined in `@imagine/shared` and used across packages:
+
 - `ImagineWindow`: window state structure
 - `AgentAction`: union of all possible agent actions
 - `AgentMessage`: SSE message format
@@ -101,6 +105,7 @@ All types are defined in `@imagine/shared` and used across packages:
 ## Package Dependencies
 
 Build order (enforced by turbo.json):
+
 1. `@imagine/shared` (rslib) - no dependencies
 2. `@imagine/ui` (rslib) - depends on @imagine/shared
 3. `@imagine/frontend` (Vite) - depends on both above
@@ -119,6 +124,7 @@ cp .env.example .env
 ```
 
 The backend runs on Bun and uses:
+
 - Hono.js for routing
 - Claude Agent SDK with model `claude-sonnet-4-20250514`
 - Server-Sent Events (SSE) for streaming

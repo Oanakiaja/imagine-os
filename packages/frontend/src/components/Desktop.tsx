@@ -123,7 +123,7 @@ export function Desktop() {
 
         // 处理完成消息
         if (message.type === 'complete') {
-          setAgentMessages((prev) => [...prev, '✅ Generate Complete']);
+          setAgentMessages((prev) => [...prev]);
         }
       }
     } catch (error) {
