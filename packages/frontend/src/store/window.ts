@@ -5,7 +5,7 @@ import { WINDOW_SIZES } from '@imagine/shared';
 interface WindowStore {
   windows: Map<string, ImagineWindow>;
   maxZIndex: number;
-  
+
   // Actions
   createWindow: (id: string, title: string, size?: WindowSize) => void;
   updateWindow: (id: string, content: string) => void;

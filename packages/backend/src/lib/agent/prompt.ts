@@ -1,7 +1,4 @@
-import { invokeClaudeCode } from './claude-code-agent';
-import type { AgentMessage } from '@imagine/shared';
-
-const IMAGINE_SYSTEM_PROMPT = `You are a UI generation agent (codename: Heli).
+export const IMAGINE_SYSTEM_PROMPT = `You are a UI generation agent.
 
 When user requests an interface, follow this EXACT sequence:
 
@@ -46,28 +43,3 @@ HTML CONTENT:
 </div>
 
 Remember: User experience is paramount. Create beautiful, functional UIs.`;
-
-export interface AgentOptions {
-  maxTokens?: number;
-}
-
-export async function* startImagineAgent(
-  userPrompt: string,
-  options: AgentOptions = {}
-): AsyncGenerator<AgentMessage> {
-  try {
-    const stream = invokeClaudeCode(userPrompt, IMAGINE_SYSTEM_PROMPT, {
-      timeout: options.maxTokens ? options.maxTokens * 100 : 60000, // 根据 token 数估算超时
-    });
-
-    for await (const message of stream) {
-      yield message;
-    }
-  } catch (error) {
-    yield {
-      type: 'error',
-      data: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: Date.now(),
-    };
-  }
-}

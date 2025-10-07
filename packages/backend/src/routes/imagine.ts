@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { stream } from 'hono/streaming';
-import { startImagineAgent } from '../lib/agent';
+import { startImagineAgent } from '../lib/agent/agent';
 import type { ImagineRequest } from '@imagine/shared';
 
 export const imagineRouter = new Hono();
@@ -15,9 +15,11 @@ imagineRouter.post('/', async (c) => {
 
   return stream(c, async (stream) => {
     // 设置 SSE headers
-    stream.onAbort(() => {
-      console.log('Client disconnected');
-    });
+    stream
+      .onAbort(() => {
+        console.log('Client disconnected');
+      })
+      .catch(console.error);
 
     try {
       for await (const message of startImagineAgent(prompt)) {

@@ -83,3 +83,44 @@ export interface ErrorState {
   recoverable: boolean;
   retryCount: number;
 }
+
+// Claude Code output-format json
+export interface ClaudeCodeResult {
+  type: 'result';
+  subtype: 'success' | 'error';
+  is_error: boolean;
+  duration_ms: number;
+  duration_api_ms: number;
+  num_turns: number;
+  result: string;
+  session_id: string;
+  total_cost_usd: number;
+  usage: {
+    input_tokens: number;
+    cache_creation_input_tokens: number;
+    cache_read_input_tokens: number;
+    output_tokens: number;
+    server_tool_use: {
+      web_search_requests: number;
+    };
+    service_tier: string;
+    cache_creation: {
+      ephemeral_1h_input_tokens: number;
+      ephemeral_5m_input_tokens: number;
+    };
+  };
+  modelUsage: {
+    // claude-sonnet-4-5-20250929
+    [modelName: string]: {
+      inputTokens: number;
+      outputTokens: number;
+      cacheReadInputTokens: number;
+      cacheCreationInputTokens: number;
+      webSearchRequests: number;
+      costUSD: number;
+      contextWindow: number;
+    };
+  };
+  permission_denials: string[];
+  uuid: string;
+}

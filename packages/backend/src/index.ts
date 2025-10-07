@@ -8,14 +8,6 @@ import { config } from 'dotenv';
 // Load environment variables with explicit path
 config();
 
-// Validate required environment variables
-if (!process.env.CLAUDE_CLI_BIN) {
-  console.error('❌ Error: CLAUDE_CLI_BIN is required in .env file');
-  process.exit(1);
-} else {
-  console.log('[using which claude]', process.env.CLAUDE_CLI_BIN);
-}
-
 const app = new Hono();
 
 // Middleware

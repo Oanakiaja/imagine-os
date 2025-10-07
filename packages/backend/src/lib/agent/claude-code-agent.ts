@@ -6,7 +6,7 @@ export interface ClaudeCodeOptions {
   workingDir?: string;
 }
 
-const get_claude_code = () => {
+const getClaudeCode = () => {
   // manuel setting
   if (process.env.CLAUDE_CLI_BIN) {
     console.log('use preset');
@@ -14,7 +14,7 @@ const get_claude_code = () => {
   }
   // use which claude to set
   try {
-    console.log('use autofind claude');
+    console.log('use auto find claude');
     const claudePath = execSync('which claude', { encoding: 'utf8' }).trim();
     if (claudePath) {
       return claudePath;
@@ -59,7 +59,7 @@ export async function* invokeClaudeCode(
     ];
 
     // 启动 Claude Code 子进程
-    claudeProcess = spawn(get_claude_code(), args, {
+    claudeProcess = spawn(getClaudeCode(), args, {
       cwd: workingDir,
       env: {
         ...process.env,

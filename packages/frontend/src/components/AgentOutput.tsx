@@ -49,7 +49,7 @@ export function AgentOutput({ messages, isGenerating }: AgentOutputProps) {
           {isGenerating && (
             <div className="flex items-center gap-2 text-red-400">
               <span className="animate-pulse text-xl">▋</span>
-              <span className="text-xs text-gray-500">Claude 回复中...</span>
+              <span className="text-xs text-gray-500">Claude Responding...</span>
             </div>
           )}
         </div>

@@ -102,19 +102,19 @@ export function Desktop() {
         // 处理错误消息
         if (message.type === 'error') {
           const errorText = typeof message.data === 'string' ? message.data : 'Unknown error';
-          setAgentMessages((prev) => [...prev, `❌ 错误: ${errorText}`]);
+          setAgentMessages((prev) => [...prev, `❌ ${errorText}`]);
           await ErrorRecovery.handleAgentError(new Error(errorText));
         }
 
         // 处理完成消息
         if (message.type === 'complete') {
-          setAgentMessages((prev) => [...prev, '✅ 完成']);
+          setAgentMessages((prev) => [...prev]);
         }
       }
     } catch (error) {
       // 网络错误恢复
       if (error instanceof Error) {
-        setAgentMessages((prev) => [...prev, `❌ 异常: ${error.message}`]);
+        setAgentMessages((prev) => [...prev, `❌ ${error.message}`]);
         if (error.message.includes('fetch') || error.message.includes('network')) {
           await ErrorRecovery.handleNetworkError(error, () => handleCommand(prompt));
         } else {
@@ -231,36 +231,7 @@ export function Desktop() {
         >
           <Plus className="h-6 w-6 text-gray-700 group-hover:text-yellow-600 transition-colors" />
         </button>
-
-        {/* 颜色选择菜单（悬停显示） */}
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
-          <div className="flex flex-col gap-2 bg-white p-2 rounded-lg shadow-lg">
-            <button
-              onClick={() => createNote('yellow')}
-              className="w-8 h-8 bg-yellow-200 border-2 border-yellow-300 rounded hover:scale-110 transition-transform"
-              title="黄色便签"
-            />
-            <button
-              onClick={() => createNote('pink')}
-              className="w-8 h-8 bg-pink-200 border-2 border-pink-300 rounded hover:scale-110 transition-transform"
-              title="粉色便签"
-            />
-            <button
-              onClick={() => createNote('blue')}
-              className="w-8 h-8 bg-blue-200 border-2 border-blue-300 rounded hover:scale-110 transition-transform"
-              title="蓝色便签"
-            />
-            <button
-              onClick={() => createNote('green')}
-              className="w-8 h-8 bg-green-200 border-2 border-green-300 rounded hover:scale-110 transition-transform"
-              title="绿色便签"
-            />
-          </div>
-        </div>
       </div>
-
-      {/* 统计信息（左下角，开发模式） */}
-      {/* 在开发环境显示统计 - 可以通过按 Ctrl+Shift+D 切换显示 */}
     </div>
   );
 }

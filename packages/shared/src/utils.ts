@@ -5,7 +5,9 @@ import type { AgentAction, WindowSize } from './types';
  */
 export function parseAgentOutput(text: string): AgentAction | null {
   // WINDOW NEW → id: xxx, title: "xxx", size: md
-  const windowNewMatch = text.match(/WINDOW NEW.*?id:\s*(\S+).*?title:\s*"([^"]+)"(?:.*?size:\s*(sm|md|lg|xl))?/);
+  const windowNewMatch = text.match(
+    /WINDOW NEW.*?id:\s*(\S+).*?title:\s*"([^"]+)"(?:.*?size:\s*(sm|md|lg|xl))?/
+  );
   if (windowNewMatch) {
     return {
       type: 'WINDOW_NEW',
@@ -71,7 +73,7 @@ export function isCodeComplete(code: string): boolean {
  */
 export function parseSSE(data: string): Record<string, any> | null {
   if (!data.startsWith('data: ')) return null;
-  
+
   try {
     return JSON.parse(data.slice(6));
   } catch {
