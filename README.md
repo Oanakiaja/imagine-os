@@ -101,35 +101,6 @@ To add new shadcn/ui components:
 pnpm ui:add
 ```
 
-## Package Details
-
-### @imagine/shared
-
-- Shared TypeScript types
-- Utility functions
-- Agent action parsers
-- Built with rslib
-
-### @imagine/ui
-
-- Reusable React components
-- Based on shadcn/ui
-- Tailwind CSS styling
-- Built with rslib
-
-### @imagine/frontend
-
-- Main React application
-- Vite for fast development
-- Zustand for state management
-- SSE client for streaming responses
-
-### @imagine/backend
-
-- Hono.js REST API
-- Claude Code CLI integration
-- Server-Sent Events (SSE) support
-
 ## Features
 
 - Real-time UI generation via Claude Code CLI
